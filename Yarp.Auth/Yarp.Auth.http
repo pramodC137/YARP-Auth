@@ -1,0 +1,6 @@
+@Yarp.Auth_HostAddress = http://localhost:5217
+
+GET {{Yarp.Auth_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
