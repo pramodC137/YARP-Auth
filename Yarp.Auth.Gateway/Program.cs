@@ -11,14 +11,26 @@ builder.Services
     .AddAuthentication(BearerTokenDefaults.AuthenticationScheme)
     .AddBearerToken();
 
+builder.Services.
+    AddAuthorization(o =>
+    {
+        o.AddPolicy("first-api-access",
+            policy => policy.RequireAuthenticatedUser().RequireClaim("first-api-access", true.ToString()));
+
+        o.AddPolicy("second-api-access",
+            policy => policy.RequireAuthenticatedUser().RequireClaim("second-api-access", true.ToString()));
+    });
+
 var app = builder.Build();
 
-app.MapGet("login", () =>
+app.MapGet("login", (bool firstApi = false, bool secondApi = false) =>
     Results.SignIn(
         new ClaimsPrincipal(
             new ClaimsIdentity(
                 [
-                    new Claim("sub", Guid.NewGuid().ToString())
+                    new Claim("sub", Guid.NewGuid().ToString()),
+                    new Claim("first-api-access", firstApi.ToString()),
+                    new Claim("second-api-access", secondApi.ToString())
                 ],
                 BearerTokenDefaults.AuthenticationScheme)),
         authenticationScheme: BearerTokenDefaults.AuthenticationScheme
